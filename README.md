@@ -14,9 +14,9 @@ Two functions are conceivably useful if implemented in Cairo:
 2. `convert_vlq_literal_to_numerical_felt (vlq : felt) -> (num : felt)`: the inverse function of `convert_numerical_felt_to_vlq_literal()`
 
 #### Requirement
-1. Create a folder in your name under `contracts/`, and a contract named `vlq.cairo` in your folder. The contract contains two `@view` functions: `convert_numerical_felt_to_vlq_literal()` and `convert_vlq_literal_to_numerical_felt()` in the function signatures specified above.
+1. Create a folder in your name under `contracts/`, and a contract named `vlq.cairo` in your folder. The contract contains two `@view` functions: `convert_numerical_felt_to_vlq_literal()` and `convert_vlq_literal_to_numerical_felt()` in the function signatures specified above. Feel free to make a copy of the template contract located at `contracts/template/vlq.cairo`.
 2. Implement the functions.
-3. Pass the test: run `pytest -s --name <name-of-your-folder> test_vlq.py`.
+3. Pass the test: run `pytest -s tests/test.py --name <name-of-your-folder>`.
 4. Have fun.
 
 #### Reference
