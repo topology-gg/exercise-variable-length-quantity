@@ -20,12 +20,12 @@ async def test (name):
     contract = await starknet.deploy(path)
     print(f"> Testing: {path}")
 
-    if name == 'template':
-        with pytest.raises(Exception) as e_info:
-            ret = await contract.convert_numerical_felt_to_vlq_literal(0).call()
-        with pytest.raises(Exception) as e_info:
-            ret = await contract.convert_vlq_literal_to_numerical_felt(0).call()
-        return
+    # if name == 'template':
+    #     with pytest.raises(Exception) as e_info:
+    #         ret = await contract.convert_numerical_felt_to_vlq_literal(0).call()
+    #     with pytest.raises(Exception) as e_info:
+    #         ret = await contract.convert_vlq_literal_to_numerical_felt(0).call()
+    #     return
 
     #
     # Test cases
@@ -38,7 +38,10 @@ async def test (name):
         ret = await contract.convert_numerical_felt_to_vlq_literal(num).call()
         assert ret.result.vlq == vlq
 
-        ret = await contract.convert_vlq_literal_to_numerical_felt(vlq).call()
-        assert ret.result.num == num
+        # ret = await contract.convert_vlq_literal_to_numerical_felt(vlq).call()
+        # assert ret.result.num == num
+
+    test_lit = await contract.test_add_12288_to_literal().invoke()
+    assert test_lit.result.vlq == 12336
 
     print(f" {name} has passed the test.")
