@@ -31,6 +31,11 @@ async def test (name):
     # Test cases
     # TODO: add more cases
     #
+    str_contract = await starknet.deploy('contracts/mocks/strMock.cairo')
+    ret = await str_contract.test_hex_literal(1).call()
+    assert ret.result.res == 0
+
+
     nums = [0, 128]
     vlqs = [12336, 942747696]
 

@@ -189,13 +189,9 @@ end
 # e.g. num = 10, hexlen = 1 => returns 'A' in string
 # note: particularly useful for handling MIDI format
 #
-func str_hex_from_number{range_check_ptr}(num : felt, hexlen : felt) -> (str : Str):
-    #
-    # Algorithm
-    # 1. convert `num` in decimal to an array of Str(literal)
-    #    e.g. convert 25 to array [str_from_literal('F'), str_from_literal('9')]
-    # 2. run str_concat_array() on the array
-    #
+func str_hex_from_number{range_check_ptr}(num : felt, hexlen : felt) -> (res : felt):
+    # TODO: Change return value both here and in the function signature into a Str
+    return (0)
 end
 
 #
