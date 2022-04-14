@@ -20,20 +20,18 @@ async def test (name):
     contract = await starknet.deploy(path)
     print(f"> Testing: {path}")
 
-    # if name == 'template':
-    #     with pytest.raises(Exception) as e_info:
-    #         ret = await contract.convert_numerical_felt_to_vlq_literal(0).call()
-    #     with pytest.raises(Exception) as e_info:
-    #         ret = await contract.convert_vlq_literal_to_numerical_felt(0).call()
-    #     return
+    if name == 'template':
+        with pytest.raises(Exception) as e_info:
+            ret = await contract.convert_numerical_felt_to_vlq_literal(0).call()
+        with pytest.raises(Exception) as e_info:
+            ret = await contract.convert_vlq_literal_to_numerical_felt(0).call()
+        return
 
     #
     # Test cases
     # TODO: add more cases
     #
-    str_contract = await starknet.deploy('contracts/mocks/strMock.cairo')
-    ret = await str_contract.test_hex_literal(1).call()
-
+    ret = await contract.test_hex_literal(1).call()
     assert ret.result.res == 49
 
 
