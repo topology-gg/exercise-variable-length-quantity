@@ -1,4 +1,5 @@
 %lang starknet
+%builtins pedersen range_check
 
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 from starkware.cairo.common.math import (
@@ -189,9 +190,65 @@ end
 # e.g. num = 10, hexlen = 1 => returns 'A' in string
 # note: particularly useful for handling MIDI format
 #
-func str_hex_from_number{range_check_ptr}(num : felt, hexlen : felt) -> (res : felt):
+func str_hex_from_number{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+        num : felt, hexlen : felt) -> (res : felt):
     # TODO: Change return value both here and in the function signature into a Str
-    return (0)
+    #
+    # Algorithm
+    # 1. convert `num` in decimal to an array of Str(literal)
+    #    e.g. convert 25 to array [str_from_literal('F'), str_from_literal('9')]
+    # 2. run str_concat_array() on the array
+    #
+    if num == 0:
+        return ('0')
+    end
+
+    let (res, _) = num_to_hex_arr(num)
+
+    return (res)
+end
+
+func num_to_hex_arr{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+        num : felt) -> (res : felt, len : felt):
+    alloc_locals
+
+    if num == 0:
+        return ('', 0)
+    end
+
+    let (local quot, local rem) = unsigned_div_rem(num, 16)
+
+    let (data_len, data) = get_hex_literals()
+    let hex_lit = [data + rem]
+
+    let (recurse_lit, len_recurse) = num_to_hex_arr(quot)
+    let (res) = literal_concat_known_length_dangerous(recurse_lit, hex_lit, len_recurse + 1)
+
+    return (res, len_recurse + 1)
+end
+
+func get_hex_literals{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (
+        data_len : felt, data : felt*):
+    let (data_address) = get_label_location(data_start)
+    return (15, data=cast(data_address, felt*))
+
+    data_start:
+    dw '0'
+    dw '1'
+    dw '2'
+    dw '3'
+    dw '4'
+    dw '5'
+    dw '6'
+    dw '7'
+    dw '8'
+    dw '9'
+    dw 'A'
+    dw 'B'
+    dw 'C'
+    dw 'D'
+    dw 'E'
+    dw 'F'
 end
 
 #

@@ -3,21 +3,24 @@
 from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 from starkware.cairo.common.math import signed_div_rem
-from contracts.util.str import literal_from_number, literal_concat_known_length_dangerous
+from contracts.util.str import (
+    str_hex_from_number, literal_from_number, literal_concat_known_length_dangerous)
 from starkware.cairo.common.math_cmp import is_le
 
 const RANGE_CHECK_BOUND = 2 ** 120
 
 @view
-func convert_numerical_felt_to_vlq_literal{range_check_ptr}(num : felt) -> (vlq : felt):
+func convert_numerical_felt_to_vlq_literal{
+        syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(num : felt) -> (
+        vlq : felt):
     let (res, _) = felt_to_vlq_recursive(num, 0)
 
     return (res)
 end
 
 @view
-func felt_to_vlq_recursive{range_check_ptr}(num : felt, is_last_byte : felt) -> (
-        vlq : felt, vlq_len : felt):
+func felt_to_vlq_recursive{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+        num : felt, is_last_byte : felt) -> (vlq : felt, vlq_len : felt):
     alloc_locals
     if is_last_byte + num == 0:
         return ('00', 2)
@@ -44,16 +47,22 @@ func felt_to_vlq_recursive{range_check_ptr}(num : felt, is_last_byte : felt) -> 
 
     local other_literal
     if is_last_byte == 1:
-        let (temp) = literal_from_number(r + 128)
+        let (temp) = str_hex_from_number(r + 128, 0)
         assert other_literal = temp
         assert res_literal = other_literal
         tempvar range_check_ptr = range_check_ptr
+        tempvar syscall_ptr = syscall_ptr
+        tempvar pedersen_ptr = pedersen_ptr
     else:
         assert res_literal = vlq_literal
         tempvar range_check_ptr = range_check_ptr
+        tempvar syscall_ptr = syscall_ptr
+        tempvar pedersen_ptr = pedersen_ptr
     end
 
     tempvar range_check_ptr = range_check_ptr
+    tempvar syscall_ptr = syscall_ptr
+    tempvar pedersen_ptr = pedersen_ptr
 
     let (recurse_vlq, len_recurse) = felt_to_vlq_recursive(q, 1)
     let (local res) = literal_concat_known_length_dangerous(
