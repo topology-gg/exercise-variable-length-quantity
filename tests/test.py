@@ -41,13 +41,14 @@ async def test (name):
     for (num, vlq) in zip (nums, vlqs):
         ret = await contract.convert_numerical_felt_to_vlq_literal(num).call()
 
-<<<<<<< HEAD
         res = get_res_str(ret.result.vlq)
         print("MY RES STRING ", res)
         assert get_res_str(ret.result.vlq) == vlq
 
         # ret = await contract.convert_vlq_literal_to_numerical_felt(vlq).call()
         # assert ret.result.num == num
+
+        print(f" {name} has passed the test (felt => vlq only).")
 
 
     print(f" {name} has passed the test.")
@@ -69,9 +70,4 @@ def fp_to_felt (val):
     else:
         val_fp = val_scaled
     return val_fp
-=======
-        # ret = await contract.convert_vlq_literal_to_numerical_felt(vlq).call()
-        # assert ret.result.num == num
 
-    print(f" {name} has passed the test (felt => vlq only).")
->>>>>>> main
