@@ -48,10 +48,7 @@ async def test (name):
         # ret = await contract.convert_vlq_literal_to_numerical_felt(vlq).call()
         # assert ret.result.num == num
 
-        print(f" {name} has passed the test (felt => vlq only).")
-
-
-    print(f" {name} has passed the test.")
+    print(f" {name} has passed the test (felt => vlq only).")
 
 def get_res_str(val):
     return hex_to_ascii(dec_to_hex(val))
