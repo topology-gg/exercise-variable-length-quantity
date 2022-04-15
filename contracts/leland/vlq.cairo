@@ -2,7 +2,7 @@
 
 from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.cairo_builtins import HashBuiltin
-from starkware.cairo.common.math import signed_div_rem
+from starkware.cairo.common.math import unsigned_div_rem, signed_div_rem
 from contracts.leland.util.str import (
     Str, str_hex_from_number, literal_from_number, literal_concat_known_length_dangerous)
 from starkware.cairo.common.math_cmp import is_le
@@ -12,63 +12,48 @@ const RANGE_CHECK_BOUND = 2 ** 120
 @view
 func convert_numerical_felt_to_vlq_literal{
         syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(num : felt) -> (
-        vlq : felt):
-    let (res, _) = felt_to_vlq_recursive(num, 0)
+        arr_len : felt, arr : felt*):
+    alloc_locals
 
-    return (res)
+    let (arr) = alloc()
+    local count
+
+    if num == 0:
+        assert count = 1
+        assert [arr] = 0
+
+        tempvar syscall_ptr = syscall_ptr
+        tempvar pedersen_ptr = pedersen_ptr
+        tempvar range_check_ptr = range_check_ptr
+    else:
+        let (count_temp) = felt_to_vlq_recursive(num=num, last_byte=1, arr_len=0, arr=arr)
+        assert count = count_temp
+
+        tempvar syscall_ptr = syscall_ptr
+        tempvar pedersen_ptr = pedersen_ptr
+        tempvar range_check_ptr = range_check_ptr
+    end
+
+    return (count, arr)
 end
 
 @view
 func felt_to_vlq_recursive{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
-        num : felt, is_last_byte : felt) -> (vlq : felt, vlq_len : felt):
+        num : felt, last_byte : felt, arr_len : felt, arr : felt*) -> (res : felt):
     alloc_locals
-    if is_last_byte + num == 0:
-        return ('00', 2)
-    else:
-        if is_last_byte + num == 1:
-            return ('', 0)
-        end
+    if num == 0:
+        return (0)
     end
 
-    let (local q, local r) = signed_div_rem(num, 128, RANGE_CHECK_BOUND)
-
-    local vlq_literal
-    local res_literal
-
-    let (flag_remainder) = is_le(r, 70)  # 70 = "F"
-    if flag_remainder == 1:
-        let (temp) = literal_from_number(r)
-        let vlq_literal_temp = temp + 12288
-        assert vlq_literal = vlq_literal_temp  # i.e "6" + 12288 = "06"
+    let (local quot, local rem) = unsigned_div_rem(num, 128)
+    if last_byte == 1:
+        assert [arr] = rem
     else:
-        let (temp) = literal_from_number(r)
-        assert vlq_literal = temp
+        assert [arr] = rem + 128
     end
 
-    local other_literal
-    if is_last_byte == 1:
-        let (temp) = str_hex_from_number(r + 128, 0)
-        assert other_literal = temp
-        assert res_literal = other_literal
-        tempvar range_check_ptr = range_check_ptr
-        tempvar syscall_ptr = syscall_ptr
-        tempvar pedersen_ptr = pedersen_ptr
-    else:
-        assert res_literal = vlq_literal
-        tempvar range_check_ptr = range_check_ptr
-        tempvar syscall_ptr = syscall_ptr
-        tempvar pedersen_ptr = pedersen_ptr
-    end
-
-    tempvar range_check_ptr = range_check_ptr
-    tempvar syscall_ptr = syscall_ptr
-    tempvar pedersen_ptr = pedersen_ptr
-
-    let (recurse_vlq, len_recurse) = felt_to_vlq_recursive(q, 1)
-    let (local res) = literal_concat_known_length_dangerous(
-        recurse_vlq, res_literal, len_recurse + 2)
-
-    return (res, 0)
+    let (res) = felt_to_vlq_recursive(quot, 0, arr_len, arr + 1)
+    return (res + 1)
 end
 
 @view

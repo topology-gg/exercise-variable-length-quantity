@@ -31,23 +31,23 @@ async def test (name):
     # Test cases
     # TODO: add more cases
     #
-    ret = await contract.test_hex_literal(1).call()
-    assert ret.result.res == 49
+    # ret = await contract.test_hex_literal(1).call()
+    # assert ret.result.res == 49
 
-
-    nums = [16383]
-    vlqs = ['00']
+    nums = [0, 64, 127, 128, 16383, 16384, 2097151]
+    vlqs = [[0], '1', '2', '3', '5', '', 1123]
 
     for (num, vlq) in zip (nums, vlqs):
         ret = await contract.convert_numerical_felt_to_vlq_literal(num).call()
 
-        res = get_res_str(ret.result.vlq)
-        print("MY RES STRING ", res)
-        assert get_res_str(ret.result.vlq) == vlq
+
+        print("arr ", ret.result.arr)
+        
+        # assert ret.result.arr == vlq
 
         # ret = await contract.convert_vlq_literal_to_numerical_felt(vlq).call()
-        # assert ret.result.num == num
 
+    assert 1 == 0
     print(f" {name} has passed the test (felt => vlq only).")
 
 def get_res_str(val):
