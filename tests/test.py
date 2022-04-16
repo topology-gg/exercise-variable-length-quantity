@@ -40,19 +40,18 @@ async def test (name):
 
 
     nums = [0, 64, 127, 128, 16383, 16384, 2097151]
-    vlqs = [127, 1, 1, 1, 1, 1, 1]
+    vlqs = ["00", "40", "7F", "8100", "FF7F", "818000", "FFFF7F"]
 
     for (num, vlq) in zip (nums, vlqs):
         ret = await contract.convert_numerical_felt_to_vlq_literal(num).call()
 
 
-        print("arr ", get_arr(ret.result.arr))
+        print("arr ", get_res_str(ret.result.res))
         
-        # assert ret.result.arr == vlq
+        assert get_res_str(ret.result.res) == vlq
 
         # ret = await contract.convert_vlq_literal_to_numerical_felt(vlq).call()
 
-    assert 1 == 0
     print(f" {name} has passed the test (felt => vlq only).")
 
 def get_arr(arr):

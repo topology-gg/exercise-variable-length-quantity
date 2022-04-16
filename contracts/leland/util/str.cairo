@@ -49,8 +49,8 @@ func concat_lit_helper{}(len : felt, arr : felt*, i) -> (res : felt):
     end
 
     let (recurse) = concat_lit_helper(len, arr, i + 1)
-    let (curr_literal) = arr[i]
-    let (res) = literal_concat_known_length_dangerous(recurse, curr_literal)
+    let curr_literal = arr[i]
+    let (res) = literal_concat_known_length_dangerous(recurse, curr_literal, 1)
 
     return (res)
 end
@@ -214,7 +214,7 @@ end
 # note: particularly useful for handling MIDI format
 #
 func str_hex_from_number{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
-        num : felt, hexlen : felt) -> (str : Str):
+        num : felt) -> (str : Str):
     # TODO: Change return value both here and in the function signature into a Str
     #
     # Algorithm
