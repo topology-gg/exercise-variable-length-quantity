@@ -34,13 +34,8 @@ async def test (name):
     ret = await contract.test_hex_literal(0).call()
     assert ret.result.res == [48]
 
-    # ret = await contract.test_hex_literal(127).invoke()
-    # print("MY ARRAY ", get_arr(ret.result.res))
-    # assert ret.result.res == [48]
-
-
-    nums = [0, 64, 127, 128, 16383, 16384, 2097151]
-    vlqs = ["00", "40", "7F", "8100", "FF7F", "818000", "FFFF7F"]
+    nums = [0, 64, 127, 128, 8192, 16383, 16384, 1048576, 2097151]
+    vlqs = ["00", "40", "7F", "8100", "C000", "FF7F", "818000", "C08000", "FFFF7F"]
 
     for (num, vlq) in zip (nums, vlqs):
         ret = await contract.convert_numerical_felt_to_vlq_literal(num).call()
