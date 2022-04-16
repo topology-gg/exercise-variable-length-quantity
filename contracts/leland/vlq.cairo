@@ -35,13 +35,13 @@ func convert_numerical_felt_to_vlq_literal{
     end
 
     let (new_arr : Str*) = alloc()
-    let (len) = iterate_through_array(count, arr, 0, new_arr, 0)
-
+    let (len) = parse_through_array(count, arr, 0, new_arr, 0)
     let (new_str) = str_concat_array(len, new_arr)
+
     return (new_str.arr_len, new_str.arr)
 end
 
-func iterate_through_array{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr} (
+func parse_through_array{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr} (
         prev_arr_len : felt, prev_arr : felt*, prev_i : felt, arr : Str*, i : felt) -> (len : felt):
     alloc_locals
     if i == prev_arr_len:
@@ -49,7 +49,6 @@ func iterate_through_array{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, ran
     end
 
     let curr_num = prev_arr[prev_i]
-    let (is_less_than) = is_le(curr_num, 15)
     let (hex_val) = str_hex_from_number(curr_num, 1)
 
     assert arr[i] = hex_val
@@ -57,12 +56,14 @@ func iterate_through_array{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, ran
     local next_i
     local max_len
 
+    let (is_less_than_f) = is_le(curr_num, 15)
     ### add another "0" if less than 15
-    if is_less_than == 1:
+    if is_less_than_f == 1:
         let (additional_zero) = str_hex_from_number(0, 1)
 
         assert arr[i + 1] = additional_zero
 
+        # Increment index and maximum length to account for extra zero
         assert next_i = i + 1
         assert max_len = prev_arr_len + 1
 
@@ -78,7 +79,7 @@ func iterate_through_array{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, ran
         tempvar range_check_ptr = range_check_ptr
     end
 
-    let (len) = iterate_through_array(max_len, prev_arr, prev_i + 1, arr, next_i + 1)
+    let (len) = parse_through_array(max_len, prev_arr, prev_i + 1, arr, next_i + 1)
     return (len)
 end
 

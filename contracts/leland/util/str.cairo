@@ -32,6 +32,29 @@ func literal_concat_known_length_dangerous{}(literal1 : felt, literal2 : felt, l
     return (res)
 end
 
+
+#
+# Given a string, concatenate its contents into a literal
+#
+func concat_literals_from_str{}(str : Str) -> (res : felt):
+    let arr = str.arr
+
+    let (res) = concat_lit_helper(str.arr_len, arr, 0)
+    return (res)
+end
+
+func concat_lit_helper{}(len : felt, arr : felt*, i) -> (res : felt):
+    if i == len:
+        return ('')
+    end
+
+    let (recurse) = concat_lit_helper(len, arr, i + 1)
+    let (curr_literal) = arr[i]
+    let (res) = literal_concat_known_length_dangerous(recurse, curr_literal)
+
+    return (res)
+end
+
 #
 # Concatenate two strings
 #
