@@ -31,17 +31,22 @@ async def test (name):
     # Test cases
     # TODO: add more cases
     #
-    # ret = await contract.test_hex_literal(1).call()
-    # assert ret.result.res == 49
+    ret = await contract.test_hex_literal(0).call()
+    assert ret.result.res == [48]
+
+    # ret = await contract.test_hex_literal(127).invoke()
+    # print("MY ARRAY ", get_arr(ret.result.res))
+    # assert ret.result.res == [48]
+
 
     nums = [0, 64, 127, 128, 16383, 16384, 2097151]
-    vlqs = [[0], '1', '2', '3', '5', '', 1123]
+    vlqs = [127, 1, 1, 1, 1, 1, 1]
 
     for (num, vlq) in zip (nums, vlqs):
         ret = await contract.convert_numerical_felt_to_vlq_literal(num).call()
 
 
-        print("arr ", ret.result.arr)
+        print("arr ", get_arr(ret.result.arr))
         
         # assert ret.result.arr == vlq
 
@@ -49,6 +54,13 @@ async def test (name):
 
     assert 1 == 0
     print(f" {name} has passed the test (felt => vlq only).")
+
+def get_arr(arr):
+    new_arr = []
+    for i, val in enumerate(arr):
+        new_arr.append(get_res_str(val))
+
+    return new_arr
 
 def get_res_str(val):
     return hex_to_ascii(dec_to_hex(val))

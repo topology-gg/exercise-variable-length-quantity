@@ -191,7 +191,7 @@ end
 # note: particularly useful for handling MIDI format
 #
 func str_hex_from_number{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
-        num : felt, hexlen : felt) -> (res : felt):
+        num : felt, hexlen : felt) -> (str : Str):
     # TODO: Change return value both here and in the function signature into a Str
     #
     # Algorithm
@@ -199,21 +199,29 @@ func str_hex_from_number{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range
     #    e.g. convert 25 to array [str_from_literal('F'), str_from_literal('9')]
     # 2. run str_concat_array() on the array
     #
+    alloc_locals
+
+    let (arr : Str*) = alloc()
+
     if num == 0:
-        return ('0')
+        let (lit) = str_from_literal('0')
+        return (lit)
     end
 
-    let (res, _) = num_to_hex_arr(num)
+    
+    let (count) = num_to_hex_arr(num, 0, arr)
+    let (new_str) = str_concat_array(count, arr)
+    let (empty) = str_empty()
 
-    return (res)
+    return (new_str)
 end
 
 func num_to_hex_arr{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
-        num : felt) -> (res : felt, len : felt):
+        num : felt, i : felt, arr : Str*) -> (count : felt):
     alloc_locals
 
     if num == 0:
-        return ('', 0)
+        return (0)
     end
 
     let (local quot, local rem) = unsigned_div_rem(num, 16)
@@ -221,10 +229,38 @@ func num_to_hex_arr{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_chec
     let (data_len, data) = get_hex_literals()
     let hex_lit = [data + rem]
 
-    let (recurse_lit, len_recurse) = num_to_hex_arr(quot)
-    let (res) = literal_concat_known_length_dangerous(recurse_lit, hex_lit, len_recurse + 1)
+    let (hex_str) = str_from_literal(hex_lit)
+    assert arr[i] = hex_str
 
-    return (res, len_recurse + 1)
+    let (count) = num_to_hex_arr(quot, i + 1, arr)
+
+    return (count + 1)
+end
+
+func dummy_test_str_concat{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (str : Str):
+    alloc_locals
+
+    let (arr : Str*) = alloc()
+    
+    dummy_test_str_helper(3, arr, 0)
+    let (new_str) = str_concat_array(3, arr)
+
+    return (new_str)
+end
+
+func dummy_test_str_helper{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}(
+        max_len : felt, arr : Str*, i : felt) -> ():
+    alloc_locals
+    if i == max_len:
+        return ()
+    end
+
+    let (hex_str) = str_from_literal('0')
+    assert arr[i] = hex_str
+
+    dummy_test_str_helper(max_len, arr, i + 1)
+
+    return ()
 end
 
 func get_hex_literals{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr}() -> (
