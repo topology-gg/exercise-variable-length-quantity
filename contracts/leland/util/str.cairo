@@ -32,6 +32,10 @@ func literal_concat_known_length_dangerous{}(literal1 : felt, literal2 : felt, l
     return (res)
 end
 
+func split_literal_into_str_array{}(literal : felt) -> (arr : Str*):
+    
+end
+
 
 #
 # Given a string, concatenate its contents into a literal
