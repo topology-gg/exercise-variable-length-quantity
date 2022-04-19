@@ -25,6 +25,9 @@ async def test (name):
     ret = await contract.test_add_12288_to_literal().invoke()
     assert get_res_str(ret.result.vlq) == "00"
 
+    ret = await contract.test_split_literal_into_array(1).call()
+    assert ret.result.arr == []
+
     print(f"passed tests")
 
 def get_arr(arr):

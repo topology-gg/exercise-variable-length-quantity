@@ -32,8 +32,14 @@ func literal_concat_known_length_dangerous{}(literal1 : felt, literal2 : felt, l
     return (res)
 end
 
-func split_literal_into_str_array{}(literal : felt) -> (arr : Str*):
-    
+func split_literal_into_str_array{range_check_ptr}(literal : felt) -> (arr : Str*):
+    alloc_locals
+
+    let (arr : Str*) = alloc()
+    let (empty_lit) = str_empty()
+    assert arr[0] = empty_lit
+
+    return (arr)
 end
 
 
@@ -101,6 +107,8 @@ func _recurse_str_concat_array{range_check_ptr}(
 
     return (arr_final_len, arr_final)
 end
+
+
 
 #
 # Create an instance of Str from single-felt string literal
