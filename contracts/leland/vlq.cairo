@@ -4,8 +4,9 @@ from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 from starkware.cairo.common.math import unsigned_div_rem, signed_div_rem
 from contracts.leland.util.str import (
-     concat_literals_from_str, str_concat_array, dummy_test_str_concat, Str, str_hex_from_number, literal_from_number, literal_concat_known_length_dangerous)
+     split_literal_into_str_array, get_val_from_hex, concat_literals_from_str, str_concat_array, dummy_test_str_concat, Str, str_hex_from_number, literal_from_number, literal_concat_known_length_dangerous)
 from starkware.cairo.common.math_cmp import is_le
+from contracts.leland.util.math import (power)
 
 const RANGE_CHECK_BOUND = 2 ** 120
 
@@ -105,16 +106,86 @@ end
 
 @view
 func convert_vlq_literal_to_numerical_felt{range_check_ptr}(vlq : felt) -> (num : felt):
-    with_attr error_message(
-            "convert_vlq_literal_to_numerical_felt() is not implemented in template."):
-        assert 1 = 0
-    end
+    alloc_locals
 
-    return (0)
+    let (literal_str) = split_literal_into_str_array(vlq)
+    let lit_arr = literal_str.arr
+    let lit_arr_len = literal_str.arr_len
+
+    let (new_arr) = alloc()
+
+    let (new_arr_len) = parse_array_vlq_to_num(lit_arr_len, lit_arr, 0, new_arr, 0)
+
+    let (sum) = sum_arr(new_arr_len, new_arr, 0)
+    
+    return (sum)
 end
 
-func parse_array_vlq_to_num(prev_arr_len : felt, prev_arr : felt*, prev_i : felt, arr : felt*, i : felt) -> (len : felt):
+func sum_arr(arr_len : felt, arr : felt*, i : felt) -> (sum : felt):
+    if i == arr_len:
+        return (0)
+    end
 
+    let curr_val = arr[i]
+    let (sum) = sum_arr(arr_len, arr, i + 1)
 
-    return (0)
+    return (sum + curr_val)
+end
+
+func parse_array_vlq_to_num{range_check_ptr}(prev_arr_len : felt, prev_arr : felt*, prev_i : felt, arr : felt*, i : felt) -> (len : felt):
+    alloc_locals
+    if prev_i == prev_arr_len:
+        return (0)
+    end
+
+    ## assume here that the literal array is reversed. i.e '8100' is ['0', '0', '1', '8']
+    let lit1 = prev_arr[prev_i + 1]
+    let lit2 = prev_arr[prev_i]
+
+    let (local dec_val1) = get_val_from_hex(lit1)
+    let (local dec_val2) = get_val_from_hex(lit2)
+
+    let (byte_val_temp) = calculate_value_from_hex_byte(dec_val1, dec_val2)
+
+    # only subtract 128 if i > 0
+    let (is_less_than) = is_le(i, 0)
+
+    local byte_val
+    # not less than equal to, so is greater than
+    if is_less_than == 0:
+        assert byte_val = byte_val_temp - 128
+    else:
+        assert byte_val = byte_val_temp
+    end
+
+    let (decimal_from_base128) = calculate_decimal_from_base_128(byte_val, i)
+
+    assert arr[i] = decimal_from_base128
+
+    let (count) = parse_array_vlq_to_num(prev_arr_len, prev_arr, prev_i + 2, arr, i + 1)
+
+    return (count + 1)
+end
+
+# 
+# f(val, e) = val * 128^e
+# f(1, 1) = 1 * 128^1
+#
+func calculate_decimal_from_base_128(base_128_val, e) -> (num : felt):
+    let (power_val) = power(128, e)
+    let res = base_128_val * power_val
+    return (res)
+end
+
+# 
+# f(val1 = 8, val2 = 1) -> 129
+#
+func calculate_value_from_hex_byte(val1 : felt, val2 : felt) -> (res : felt):
+    # x = val1 * 16^1 = val1 * 16
+    let x = val1 * 16
+
+    # y = val2 * 16^0 = val2
+    let y = val2
+
+    return (x + y)
 end

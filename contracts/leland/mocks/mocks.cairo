@@ -9,24 +9,37 @@ from starkware.cairo.common.math_cmp import is_le
 
 const RANGE_CHECK_BOUND = 2 ** 120
 
-from contracts.leland.vlq import parse_array_vlq_to_num
+from contracts.leland.vlq import parse_array_vlq_to_num, sum_arr
 
 @view
-func test_parse_array_vlq_to_num() -> (arr_len : felt, arr : felt*):
+func test_parse_array_vlq_to_num{range_check_ptr}(lit : felt) -> (arr_len : felt, arr : felt*):
     alloc_locals
 
-    let (arr) = alloc()
-    assert arr[0] = '0'
-    assert arr[1] = '0'
-    assert arr[2] = '1'
-    assert arr[3] = '8'
+    let (literal_str) = split_literal_into_str_array(lit)
+    let lit_arr = literal_str.arr
+    let lit_arr_len = literal_str.arr_len
 
     let (new_arr) = alloc()
 
-    let (num) = parse_array_vlq_to_num(0, arr, 0, new_arr, 0)
-    assert arr[0] = 0
+    let (num) = parse_array_vlq_to_num(lit_arr_len, lit_arr, 0, new_arr, 0)
 
-    return (0, arr)
+    return (num, new_arr)
+end
+
+@view
+func test_vlq_to_num{range_check_ptr}(lit : felt) -> (sum : felt):
+    alloc_locals
+
+    let (literal_str) = split_literal_into_str_array(lit)
+    let lit_arr = literal_str.arr
+    let lit_arr_len = literal_str.arr_len
+
+    let (new_arr) = alloc()
+
+    let (new_arr_len) = parse_array_vlq_to_num(lit_arr_len, lit_arr, 0, new_arr, 0)
+
+    let (sum) = sum_arr(new_arr_len, new_arr, 0)
+    return (sum)
 end
 
 @view 
@@ -34,6 +47,15 @@ func test_get_literal_from_hex{range_check_ptr}(lit : felt) -> (val : felt):
     let (val) = get_val_from_hex(lit)
 
     return (val)
+end
+
+@view
+func test_something() -> (num : felt):
+    alloc_locals
+    let (arr : felt*) = alloc()
+    assert arr[24] = 1
+
+    return (0)
 end
 
 @view

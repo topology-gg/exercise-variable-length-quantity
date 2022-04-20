@@ -41,11 +41,18 @@ async def test (name):
     # ret = await contract.test_split_literal_into_array(val).call()
     # assert get_arr(ret.result.arr) == ["0", "0"]
 
-    ret = await contract.test_get_literal_from_hex(get_felt_from_ascii("0")).call()
-    assert ret.result.val == 0
+    # ret = await contract.test_get_literal_from_hex(get_felt_from_ascii("0")).call()
+    # assert ret.result.val == 0
 
-    ret = await contract.test_get_literal_from_hex(get_felt_from_ascii("A")).call()
-    assert ret.result.val == 10
+    # ret = await contract.test_get_literal_from_hex(get_felt_from_ascii("A")).call()
+    # assert ret.result.val == 10
+
+    # ret = await contract.test_parse_array_vlq_to_num(get_felt_from_ascii("8100")).invoke()
+    # assert ret.result.arr == [0]
+
+    ret = await contract.test_vlq_to_num(get_felt_from_ascii("8100")).invoke()
+    assert ret.result.sum == 128
+
 
     print(f"passed tests")
 
