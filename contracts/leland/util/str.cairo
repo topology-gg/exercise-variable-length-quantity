@@ -32,14 +32,30 @@ func literal_concat_known_length_dangerous{}(literal1 : felt, literal2 : felt, l
     return (res)
 end
 
-func split_literal_into_str_array{range_check_ptr}(literal : felt) -> (arr : Str*):
+func split_literal_into_str_array{range_check_ptr}(lit : felt) -> (str : Str):
     alloc_locals
 
-    let (arr : Str*) = alloc()
-    let (empty_lit) = str_empty()
-    assert arr[0] = empty_lit
+    let (arr) = alloc()
 
-    return (arr)
+    let (count) = split_literal_into_str_array_helper(arr, 0, lit)
+
+    return (Str(count, arr))
+end
+
+func split_literal_into_str_array_helper{range_check_ptr}(arr : felt*, i : felt, literal : felt) -> (len : felt):
+    alloc_locals
+
+    if literal == 0:
+        return (0) 
+    end
+    
+    let (local quot, local rem) = unsigned_div_rem(literal, 256)
+
+    assert arr[i] = rem
+
+    let (len) = split_literal_into_str_array_helper(arr, i + 1, quot)
+
+    return (len + 1)
 end
 
 

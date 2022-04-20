@@ -12,11 +12,20 @@ const RANGE_CHECK_BOUND = 2 ** 120
 @view
 func test_split_literal_into_array{range_check_ptr}(num : felt) -> (arr_len : felt, arr : felt*):
     alloc_locals
-    let (literal) = literal_from_number(num)
+
     let (literal_arr) = split_literal_into_str_array(num)
 
     return (literal_arr.arr_len, literal_arr.arr)
 end
+
+@view 
+func test_literal_divide{range_check_ptr}() -> (rem : felt):
+    let literal = '1234'
+    let (quot, rem) = unsigned_div_rem(literal, 256)
+
+    return (rem)
+end
+
 
 @view
 func test_add_12288_to_literal{range_check_ptr}() -> (vlq : felt):
