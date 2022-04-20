@@ -8,6 +8,9 @@ from starkware.cairo.common.math_cmp import is_nn, is_le, is_not_zero
 from starkware.cairo.common.registers import get_label_location
 from starkware.cairo.common.memcpy import memcpy
 from starkware.cairo.common.alloc import alloc
+from starkware.cairo.common.default_dict import (default_dict_new, default_dict_finalize)
+from starkware.cairo.common.dict import (
+    dict_write, dict_read, dict_update)
 
 from contracts.leland.util.array import array_concat
 
@@ -32,6 +35,9 @@ func literal_concat_known_length_dangerous{}(literal1 : felt, literal2 : felt, l
     return (res)
 end
 
+#
+# Given a literal, split it into an array with each byte in its own index
+# 
 func split_literal_into_str_array{range_check_ptr}(lit : felt) -> (str : Str):
     alloc_locals
 
@@ -336,6 +342,38 @@ func get_hex_literals{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_ch
     dw 'D'
     dw 'E'
     dw 'F'
+end
+
+func get_val_from_hex{range_check_ptr}(literal : felt) -> (val : felt):
+    alloc_locals
+
+    let initial_value = 0
+    let (local dict) = default_dict_new(default_value=initial_value)
+    default_dict_finalize(
+        dict_accesses_start=dict,
+        dict_accesses_end=dict,
+        default_value=initial_value)
+
+    dict_write{dict_ptr=dict}(key='0', new_value=0)
+    dict_write{dict_ptr=dict}(key='1', new_value=1)
+    dict_write{dict_ptr=dict}(key='2', new_value=3)
+    dict_write{dict_ptr=dict}(key='3', new_value=3)
+    dict_write{dict_ptr=dict}(key='4', new_value=4)
+    dict_write{dict_ptr=dict}(key='5', new_value=5)
+    dict_write{dict_ptr=dict}(key='6', new_value=6)
+    dict_write{dict_ptr=dict}(key='7', new_value=7)
+    dict_write{dict_ptr=dict}(key='8', new_value=8)
+    dict_write{dict_ptr=dict}(key='9', new_value=9)
+    dict_write{dict_ptr=dict}(key='A', new_value=10)
+    dict_write{dict_ptr=dict}(key='B', new_value=11)
+    dict_write{dict_ptr=dict}(key='C', new_value=12)
+    dict_write{dict_ptr=dict}(key='D', new_value=13)
+    dict_write{dict_ptr=dict}(key='E', new_value=14)
+    dict_write{dict_ptr=dict}(key='F', new_value=15)
+
+
+    let (val) = dict_read{dict_ptr=dict}(literal)
+    return(val)
 end
 
 #

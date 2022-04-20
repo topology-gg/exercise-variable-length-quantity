@@ -23,23 +23,29 @@ async def test (name):
     # Test cases
     # TODO: add more cases
     #
-    ret = await contract.test_add_12288_to_literal().invoke()
-    assert get_res_str(ret.result.vlq) == "00"
+    # ret = await contract.test_add_12288_to_literal().invoke()
+    # assert get_res_str(ret.result.vlq) == "00"
 
-    ret = await contract.test_literal_divide().call()
-    assert get_res_str(ret.result.rem) == "4"
+    # ret = await contract.test_literal_divide().call()
+    # assert get_res_str(ret.result.rem) == "4"
 
-    val = get_felt_from_ascii("123")
-    ret = await contract.test_split_literal_into_array(val).call()
-    assert get_arr(ret.result.arr) == ["3", "2", "1"]
+    # val = get_felt_from_ascii("123")
+    # ret = await contract.test_split_literal_into_array(val).call()
+    # assert get_arr(ret.result.arr) == ["3", "2", "1"]
 
-    val = get_felt_from_ascii("0")
-    ret = await contract.test_split_literal_into_array(val).call()
-    assert get_arr(ret.result.arr) == ["0"]
+    # val = get_felt_from_ascii("0")
+    # ret = await contract.test_split_literal_into_array(val).call()
+    # assert get_arr(ret.result.arr) == ["0"]
 
-    val = get_felt_from_ascii("00")
-    ret = await contract.test_split_literal_into_array(val).call()
-    assert get_arr(ret.result.arr) == ["0", "0"]
+    # val = get_felt_from_ascii("00")
+    # ret = await contract.test_split_literal_into_array(val).call()
+    # assert get_arr(ret.result.arr) == ["0", "0"]
+
+    ret = await contract.test_get_literal_from_hex(get_felt_from_ascii("0")).call()
+    assert ret.result.val == 0
+
+    ret = await contract.test_get_literal_from_hex(get_felt_from_ascii("A")).call()
+    assert ret.result.val == 10
 
     print(f"passed tests")
 

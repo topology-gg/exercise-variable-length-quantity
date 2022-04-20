@@ -66,6 +66,8 @@ def hex_to_ascii(hex_str):
     asc = bytearray.fromhex(hex_str[2:]).decode()
     return asc
 
+
+
 def fp_to_felt (val):
     val_scaled = int (val * SCALE_FP)
     if val_scaled < 0:

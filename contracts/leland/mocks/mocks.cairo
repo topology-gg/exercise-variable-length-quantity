@@ -4,17 +4,43 @@ from starkware.cairo.common.alloc import alloc
 from starkware.cairo.common.cairo_builtins import HashBuiltin
 from starkware.cairo.common.math import unsigned_div_rem, signed_div_rem
 from contracts.leland.util.str import (
-     split_literal_into_str_array, concat_literals_from_str, str_concat_array, dummy_test_str_concat, Str, str_hex_from_number, literal_from_number, literal_concat_known_length_dangerous)
+     get_val_from_hex, split_literal_into_str_array, concat_literals_from_str, str_concat_array, dummy_test_str_concat, Str, str_hex_from_number, literal_from_number, literal_concat_known_length_dangerous)
 from starkware.cairo.common.math_cmp import is_le
 
 const RANGE_CHECK_BOUND = 2 ** 120
+
+from contracts.leland.vlq import parse_array_vlq_to_num
+
+@view
+func test_parse_array_vlq_to_num() -> (arr_len : felt, arr : felt*):
+    alloc_locals
+
+    let (arr) = alloc()
+    assert arr[0] = '0'
+    assert arr[1] = '0'
+    assert arr[2] = '1'
+    assert arr[3] = '8'
+
+    let (new_arr) = alloc()
+
+    let (num) = parse_array_vlq_to_num(0, arr, 0, new_arr, 0)
+    assert arr[0] = 0
+
+    return (0, arr)
+end
+
+@view 
+func test_get_literal_from_hex{range_check_ptr}(lit : felt) -> (val : felt):
+    let (val) = get_val_from_hex(lit)
+
+    return (val)
+end
 
 @view
 func test_split_literal_into_array{range_check_ptr}(num : felt) -> (arr_len : felt, arr : felt*):
     alloc_locals
 
     let (literal_arr) = split_literal_into_str_array(num)
-
     return (literal_arr.arr_len, literal_arr.arr)
 end
 
@@ -25,7 +51,6 @@ func test_literal_divide{range_check_ptr}() -> (rem : felt):
 
     return (rem)
 end
-
 
 @view
 func test_add_12288_to_literal{range_check_ptr}() -> (vlq : felt):

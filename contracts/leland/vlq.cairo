@@ -34,7 +34,7 @@ func convert_numerical_felt_to_vlq_literal{
     end
 
     let (new_arr : Str*) = alloc()
-    let (len) = parse_through_array(count, arr, 0, new_arr, 0)
+    let (len) = parse_array_num_to_vlq(count, arr, 0, new_arr, 0)
     let (new_str) = str_concat_array(len, new_arr)
 
     let (res_literal) = concat_literals_from_str(new_str)
@@ -42,7 +42,7 @@ func convert_numerical_felt_to_vlq_literal{
     return (res_literal)
 end
 
-func parse_through_array{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr} (
+func parse_array_num_to_vlq{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range_check_ptr} (
         prev_arr_len : felt, prev_arr : felt*, prev_i : felt, arr : Str*, i : felt) -> (len : felt):
     alloc_locals
     if i == prev_arr_len:
@@ -80,7 +80,7 @@ func parse_through_array{syscall_ptr : felt*, pedersen_ptr : HashBuiltin*, range
         tempvar range_check_ptr = range_check_ptr
     end
 
-    let (len) = parse_through_array(max_len, prev_arr, prev_i + 1, arr, next_i + 1)
+    let (len) = parse_array_num_to_vlq(max_len, prev_arr, prev_i + 1, arr, next_i + 1)
     return (len)
 end
 
@@ -109,6 +109,12 @@ func convert_vlq_literal_to_numerical_felt{range_check_ptr}(vlq : felt) -> (num 
             "convert_vlq_literal_to_numerical_felt() is not implemented in template."):
         assert 1 = 0
     end
+
+    return (0)
+end
+
+func parse_array_vlq_to_num(prev_arr_len : felt, prev_arr : felt*, prev_i : felt, arr : felt*, i : felt) -> (len : felt):
+
 
     return (0)
 end
