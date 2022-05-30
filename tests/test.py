@@ -55,6 +55,10 @@ async def test (name):
 
     # print(f" {name} has passed the test for vlq => name. All tests completed.")
 
+#
+# Utility function to convert short string literall to felt
+# reference: https://github.com/OpenZeppelin/cairo-contracts/blob/main/tests/utils.py
+#
 def str_to_felt(text):
     b_text = bytes(text, "ascii")
     return int.from_bytes(b_text, "big")
