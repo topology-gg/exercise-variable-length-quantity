@@ -31,14 +31,19 @@ async def test (name):
     # Test cases
     # TODO: add more cases
     #
-    nums = [0, 128]
-    vlqs = [12336, 942747696]
+    nums = [0, 128, 16383]
+    vlqs = [12336, 942747696, 1179006790]
+
+    nums1 = [14384, 860243526]
+    vlqs1 = [33024, 65407]
 
     for (num, vlq) in zip (nums, vlqs):
         ret = await contract.convert_numerical_felt_to_vlq_literal(num).call()
         assert ret.result.vlq == vlq
 
-        # ret = await contract.convert_vlq_literal_to_numerical_felt(vlq).call()
-        # assert ret.result.num == num
+    for (num, vlq) in zip (nums1, vlqs1):
+        ret = await contract.convert_vlq_literal_to_numerical_felt(vlq).call()
+        assert ret.result.num == num
+
 
     print(f" {name} has passed the test (felt => vlq only).")
