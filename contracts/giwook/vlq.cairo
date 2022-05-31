@@ -8,6 +8,7 @@ from starkware.cairo.common.math_cmp import is_le
 const zero = '0'
 const overTen = 'A'
 
+#convert hex value to single charactor ascii value
 @view
 func hex_to_ascii{range_check_ptr}(hex : felt) -> (ascii : felt):
 
@@ -22,9 +23,10 @@ func hex_to_ascii{range_check_ptr}(hex : felt) -> (ascii : felt):
 
 end
 
+#convert single charactor ascii value to hex value
 @view
 func ascii_to_hex{range_check_ptr}(ascii : felt) -> (hex : felt):
-
+    
     let (isOverTen) = is_le('A'-1,ascii)
     if isOverTen == 0:
         tempvar hex = ascii - zero
@@ -36,6 +38,7 @@ func ascii_to_hex{range_check_ptr}(ascii : felt) -> (hex : felt):
 
 end
 
+#convert hex value to string ( 0x8100 -> '8100' )
 @view
 func convert_hex_to_char {range_check_ptr}(hex : felt) -> (char : felt):
     alloc_locals
@@ -45,6 +48,7 @@ func convert_hex_to_char {range_check_ptr}(hex : felt) -> (char : felt):
     if qout != 0:
         let (result) = convert_hex_to_char(qout)
         let (ascii) = hex_to_ascii(rem)
+        #Adjust character's position
         return(result * 256 + ascii)
     end
 
@@ -52,6 +56,7 @@ func convert_hex_to_char {range_check_ptr}(hex : felt) -> (char : felt):
     
 end
 
+#convert string to hex value ( '8100' -> 0x8100 )
 @view
 func convert_char_to_hex {range_check_ptr}(char : felt) -> (hex : felt):
     alloc_locals
@@ -61,6 +66,7 @@ func convert_char_to_hex {range_check_ptr}(char : felt) -> (hex : felt):
     if qout != 0:
         let (result) = convert_char_to_hex(qout)
         let (hex) = ascii_to_hex(rem)
+        #Adjusting the position of number
         return(result * 16 + hex)
     end
 
@@ -132,6 +138,7 @@ func vlq2num{range_check_ptr}(vlq : felt) -> (num : felt):
     
     if qout != 0:
         let (temp) = vlq2num(qout)
+        #Adjusting the position of number
         let result = temp * 128 + rem
         return (result)
     end
