@@ -47,13 +47,13 @@ async def test (name):
 
     print(f" {name} has passed the test for num => vlq.")
 
-    # for case in test_cases:
-    #     num = case['num']
-    #     vlq = case['vlq']
-    #     ret = await contract.convert_vlq_literal_to_numerical_felt(vlq).call()
-    #     assert ret.result.num == num
+    for case in test_cases:
+         num = case['num']
+         vlq = case['vlq']
+         ret = await contract.convert_vlq_literal_to_numerical_felt(vlq).call()
+         assert ret.result.num == num
 
-    # print(f" {name} has passed the test for vlq => name. All tests completed.")
+    print(f" {name} has passed the test for vlq => name. All tests completed.")
 
 #
 # Utility function to convert short string literall to felt
