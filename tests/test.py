@@ -31,14 +31,34 @@ async def test (name):
     # Test cases
     # TODO: add more cases
     #
-    nums = [0, 128]
-    vlqs = [12336, 942747696]
+    test_cases = [
+        {'num' : 0, 'vlq' : str_to_felt ('00')},
+        {'num' : 64, 'vlq' : str_to_felt ('40')},
+        {'num' : 128, 'vlq' : str_to_felt ('8100')},
+        {'num' : 8192, 'vlq' : str_to_felt ('C000')},
+        {'num' : 16383, 'vlq' : str_to_felt ('FF7F')}
+    ]
 
-    for (num, vlq) in zip (nums, vlqs):
+    for case in test_cases:
+        num = case['num']
+        vlq = case['vlq']
         ret = await contract.convert_numerical_felt_to_vlq_literal(num).call()
         assert ret.result.vlq == vlq
 
-        # ret = await contract.convert_vlq_literal_to_numerical_felt(vlq).call()
-        # assert ret.result.num == num
+    print(f" {name} has passed the test for num => vlq.")
 
-    print(f" {name} has passed the test (felt => vlq only).")
+    # for case in test_cases:
+    #     num = case['num']
+    #     vlq = case['vlq']
+    #     ret = await contract.convert_vlq_literal_to_numerical_felt(vlq).call()
+    #     assert ret.result.num == num
+
+    # print(f" {name} has passed the test for vlq => name. All tests completed.")
+
+#
+# Utility function to convert short string literall to felt
+# reference: https://github.com/OpenZeppelin/cairo-contracts/blob/main/tests/utils.py
+#
+def str_to_felt(text):
+    b_text = bytes(text, "ascii")
+    return int.from_bytes(b_text, "big")
